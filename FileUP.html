@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="js/angular/angular-sanitize.js"></script>
+    <script src="js/angular/file-uploading/ng-file-upload-shim.js"></script>
+    <script src="js/angular/file-uploading/ng-file-upload.js"></script>
+
+</head>
+<body ng-app="app" ng-controller="appController">
+
+<input type="file" id="testfile"
+       ngf-select
+       ng-model="picFile" name="file"
+       accept="image/*" required/>
+
+<button ng-click="upload(picFile)">upload</button>
+
+<script>
+    var app = angular.module('app', ['ngSanitize', 'ngFileUpload']);
+
+    app.controller('appController', ['$scope', '$http', 'Upload', '$timeout', function ($scope, $http, Upload, $timeout) {
+//        alert();
+        $scope.pro;
+        $scope.proVal;
+        $scope.upload = function (file) {
+
+            alert(file);
+            file.upload = Upload.upload({
+                method: "POST",
+                headers: {'Access-Control-Allow-Origin': '*'},
+                url: "http://srichat.lk/mfile/controller/image_uploader.php",
+                data: {
+                    action: "single",
+                    file: file,
+                    path: "/srichat.lk/get/files/img/hotel/1/original",
+                    width: "100",
+                    height: "100",
+                    name: "Newhnijname.jpg"
+                }
+            });
+
+            file.upload.then(function (response) {
+
+                $timeout(function () {
+
+                    if (response.status == 200) {
+                        console.log(response);
+                    } else {
+                        alert('fail');
+                    }
+                });
+            }, function (response) {
+                // alert(JSON.stringify(response.data.url));
+
+            }, function (evt) {
+
+                // Math.min is to fix IE which reports 200% sometimes
+                $scope.pro = Math.min(100, parseInt(100.0 * evt.loaded / evt.total)) + '%';
+                $scope.proVal = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                $scope.progress = {
+                    width: $scope.pro
+                };
+
+            });
+        }
+
+    }]);
+</script>
+</body>
+</html>
